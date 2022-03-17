@@ -1,0 +1,168 @@
+{
+	"info": {
+		"_postman_id": "648b732c-dd39-4eb9-a299-0e050edc7104",
+		"name": "ERP-ApiTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get-user_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//1>提取token设置为全局变量\r",
+							"//打印日志响应体\r",
+							"console.log(responseBody)\r",
+							"\r",
+							"//通过 json提取器提取鉴权码token\r",
+							"//把返回值转化为json格式的字典赋值变量jsData\r",
+							"//var jsData = JSON.parse(responseBody)\r",
+							"//提取token值_\r",
+							"//console.log(jsData.token)\r",
+							"//设置为全局交量\r",
+							"//pm.globals.set(\"token\",jsData.token);\r",
+							"\r",
+							"//正则表达式提取器\r",
+							"//match匹配\r",
+							"var jsDate=responseBody.match(new RegExp('\"token\":\"(.+?)\",'))\r",
+							"//打印日志jsDate变量中下标为1的值检查是不是token值\r",
+							"console.log (jsDate[1])\r",
+							"//将jsDate变量中下标为1的值设置为全局交量命名为token\r",
+							"pm.globals.set(\"token\",jsDate[1]);\r",
+							"\r",
+							"//2>断言检查\r",
+							"//状态断言：断言返回的状态码为200\r",
+							"pm.test(\"Status code:Code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"//业务断言：断言返回结果包含token字符串\r",
+							"pm.test(\"Body matches string:token\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"token\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": " application/json, text/plain, */*",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36:",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"loginName\":\"xing_xu\",\"password\":\"1234567\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dev-backend.lanjingerp.com/user/rest/v2/login",
+					"protocol": "https",
+					"host": [
+						"dev-backend",
+						"lanjingerp",
+						"com"
+					],
+					"path": [
+						"user",
+						"rest",
+						"v2",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-sku",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//业务断言\r",
+							"pm.test(\"Body matches string:data\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"data\");\r",
+							"});\r",
+							"\r",
+							"//通过 json提取器提取data值\r",
+							"//把返回值转化为json格式的字典)\r",
+							"var jsData = JSON.parse(responseBody)\r",
+							"//打印提取采购计划单据的Id值_\r",
+							"console.log(jsData.data)\r",
+							"//将data值设置为全局变量\r",
+							"pm.globals.set(\"sku_id\",jsData.data );"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomInt = (min,max) =>Math.floor(Math.random()*(max-min+1))+min\r",
+							"var skuName=randomInt(1000,2000)\r",
+							"pm.globals.set(\"skuName\", skuName);\r",
+							"console.log(randomInt(1000,9000))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"sku\": \"H61A{{skuName}}\",\r\n    \"brand\": \"Govee\",\r\n    \"productLineId\": 61,\r\n    \"name\": \"产品名称台灯\",\r\n    \"useFor\": \"用途测试发票使用\",\r\n    \"state\": 0,\r\n    \"priority\": 0,\r\n    \"targetStar\": \"5\",\r\n    \"productDesc\": \"产品描述测试发票使用\",\r\n    \"specifications\": \"1000*800*500\",\r\n    \"material\": 1,\r\n    \"specialMaterial\": \"铜\",\r\n    \"lightEfficiency\": \"光效\",\r\n    \"waterProof\": 1,\r\n    \"alexa\": 1,\r\n    \"googleAssistant\": 1,\r\n    \"withPower\": 1,\r\n    \"powerSupplyModel\": 2,\r\n    \"voltage\": \"220\",\r\n    \"power\": \"2000\",\r\n    \"psPowerType\": 1,\r\n    \"psPowerNum\": \"5000\",\r\n    \"psPowerCapacity\": \"5000\",\r\n    \"withScreen\": 1,\r\n    \"screenSize\": \"5\",\r\n    \"comProtocol\": [\r\n        3\r\n    ],\r\n    \"comProtocolDistance\": \"20\",\r\n    \"packingList\": \"包装清单\",\r\n    \"cerInfoList\": \"认证信息\",\r\n    \"cerInfoLink\": \"www.baidu.com\",\r\n    \"packageInfo\": \"说明书\",\r\n    \"sellingPoint\": \"卖点1.\\n卖点2\\n卖点3.\",\r\n    \"width\": \"80\",\r\n    \"length\": \"100\",\r\n    \"height\": \"50\",\r\n    \"weight\": \"3\",\r\n    \"innerBoxNumber\": 10,\r\n    \"powerType\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dev-backend.lanjingerp.com/sales/rest/v2/sku-managements",
+					"protocol": "https",
+					"host": [
+						"dev-backend",
+						"lanjingerp",
+						"com"
+					],
+					"path": [
+						"sales",
+						"rest",
+						"v2",
+						"sku-managements"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
